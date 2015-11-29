@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# will build code on ubuntu
+
+sudo apt-get update
+
+# install go lang
+VERSION=1.5.1
+wget https://storage.googleapis.com/golang/go$VERSION.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go$VERSION.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
+
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
+# get max mind C library
+sudo apt-get install -y libgeoip1 libgeoip-dev
+
+# get maxmind db
+
+sudo apt-get install -y git, pkg-config
+
+# cd /vagrant
+
+# get dependancies
+go get -v
+
+# build the code
+REVISION=`git rev-parse --short=5  HEAD`
+BUILDTIME=`TZ=UTC date "+%Y-%m-%dT%H:%MZ"`
+echo $REVISION > REVISION
+go build \
+  -ldflags "-X main.gitVersion $REVISION -X main.buildTime $BUILDTIME" \
+  -v && \
+go install

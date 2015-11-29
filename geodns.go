@@ -48,8 +48,12 @@ var (
 	flaginter       = flag.String("interface", "*", "set the listener address")
 	flagport        = flag.String("port", "53", "default port number")
 	flaghttp        = flag.String("http", ":8053", "http listen address (:8053)")
+	flagapi         = flag.Bool("api", false, "whether api is enabled or not")
+	flagapiport     = flag.String("apiport", ":443", "api listen address (:443)")
+	flagapicert     = flag.String("apicert", "", "filename of cert for API to use")	
 	flaglog         = flag.Bool("log", false, "be more verbose")
 	flagcpus        = flag.Int("cpus", 1, "Set the maximum number of CPUs to use")
+	flagproxy       = flag.Bool("proxy", false, "proxy any queries not authoritative for")
 
 	flagShowVersion = flag.Bool("version", false, "Show dnsconfig version")
 
@@ -166,6 +170,11 @@ func main() {
 
 	dirName := *flagconfig
 	go zonesReader(dirName, Zones)
+
+	// setup api
+	if *flagapi {
+		go startApi(Zones)
+	}
 
 	for _, host := range inter {
 		go listenAndServe(host)
